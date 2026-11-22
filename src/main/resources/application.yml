@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    url: ${SHELF_DB_URL:jdbc:postgresql://localhost:5432/shelf}
+    username: ${SHELF_DB_USER:shelf}
+    password: ${SHELF_DB_PASSWORD:shelf}
+  session:
+    jdbc:
+      initialize-schema: never
+  mail:
+    host: ${SHELF_SMTP_HOST:localhost}
+    port: ${SHELF_SMTP_PORT:1025}
+    username: ${SHELF_SMTP_USER:}
+    password: ${SHELF_SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SHELF_SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SHELF_SMTP_STARTTLS:false}
+      mail.smtp.starttls.required: ${SHELF_SMTP_STARTTLS:false}
+      mail.smtp.connectiontimeout: 3000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 26MB
+server:
+  port: ${SHELF_API_PORT:8080}
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        http-only: true
+        secure: ${SHELF_SECURE_COOKIE:true}
+        same-site: lax
+  error:
+    include-message: never
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: WARN
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: WARN
+shelf:
+  secure-cookie: ${SHELF_SECURE_COOKIE:true}
+  web-origin: ${SHELF_WEB_ORIGIN:http://localhost:3000}
+  mail-from: ${SHELF_MAIL_FROM:no-reply@shelf.local}
+  assets:
+    enabled: ${SHELF_ASSETS_ENABLED:false}
+    r2-account: ${SHELF_R2_ACCOUNT:}
+    r2-bucket: ${SHELF_R2_BUCKET:}
+    r2-key-id: ${SHELF_R2_KEY_ID:}
+    r2-secret: ${SHELF_R2_SECRET:}
+    clamav-host: ${SHELF_CLAMAV_HOST:}
+    clamav-port: ${SHELF_CLAMAV_PORT:3310}
+    account-bytes: ${SHELF_ACCOUNT_ASSET_BYTES:8000000000}
+    user-bytes: ${SHELF_USER_ASSET_BYTES:100000000}
