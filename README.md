@@ -11,7 +11,7 @@ docker compose up -d
 SHELF_SECURE_COOKIE=false mvn spring-boot:run
 ```
 
-Spring applies the Flyway migrations on startup. The API uses port 8080. Open the Mailpit inbox at http://localhost:8025 to read verification and password-reset links sent by the local app.
+Spring applies the Flyway migrations on startup. The API uses port 8080 and connects to the Docker database at 127.0.0.1:15432. Open the Mailpit inbox at http://localhost:8025 to read verification and password-reset links sent by the local app.
 
 Create and verify an account before granting it moderator access in the local database. Substitute the address for that account in the following query.
 
@@ -22,6 +22,12 @@ where email = 'moderator@example.com' and verified;
 ```
 
 Moderators can review seller applications, listing revisions, and directory and affiliation requests. Add colleges through the directory workflow or seed the pilot's institution directory in PostgreSQL. A user can verify an affiliation with an account email whose verified domain exactly matches the configured college domain, or submit a request for review.
+
+## Google sign-in and email
+
+For local password sign-in, open the site consistently at `http://localhost:3000` and start Spring with `SHELF_SECURE_COOKIE=false`. On HTTPS deployments keep the secure cookie enabled. Local verification and password-reset messages go to the [Mailpit inbox](http://localhost:8025). For external delivery set `SHELF_SMTP_HOST`, `SHELF_SMTP_PORT`, `SHELF_SMTP_USER`, `SHELF_SMTP_PASSWORD`, `SHELF_SMTP_AUTH=true`, `SHELF_SMTP_STARTTLS=true` and a provider-authorized `SHELF_MAIL_FROM`. Set `SHELF_WEB_ORIGIN` to the public frontend origin for links.
+
+To enable Google, create a **Web application** OAuth client in Google Cloud. Register `http://localhost:3000/api/login/oauth2/code/google` as the authorized redirect URI for development and the corresponding HTTPS frontend URI for production. Configure the consent screen and test users as applicable. Provide `SHELF_GOOGLE_CLIENT_ID`, `SHELF_GOOGLE_CLIENT_SECRET`, `SHELF_WEB_ORIGIN` (without a trailing slash) and enable the Spring profile `google` via `SPRING_PROFILES_ACTIVE`. Restart Spring. The frontend reads provider availability from the backend. Google identities are identified by their stable subject. Existing password accounts use their original sign-in method when emails collide.
 
 ## Module ownership
 
@@ -34,8 +40,11 @@ Moderators can review seller applications, listing revisions, and directory and 
 | Moderation | Review actions, decision history, reports, and appeals |
 | Pickup | Requests, scheduling, and the database constraint that permits one reservation per item |
 | Commerce | Read-only payment status surfaces and disabled transaction endpoints |
+| Capabilities | Reports upload and payment availability through the Assets and Commerce module interfaces |
 
-Feature packages expose their cross-module contracts at the package root and keep their implementations in `internal`. A feature accesses another feature's data through its public contract. Spring Modulith verifies these import boundaries and dependency cycles. Each feature owns its PostgreSQL schema.
+Feature packages expose cross-module contracts at the package root. Within each feature, `internal/controller` handles HTTP routes and request validation, `internal/service` handles business rules and transactions, `internal/persistence` owns SQL and row mapping, and `internal/model` contains the records used by those layers. Features with provider integrations or configuration use `internal/integration` and `internal/config` as needed. Next.js owns the rendered views.
+
+Each feature owns its PostgreSQL schema. Spring Modulith verifies cross-feature imports and dependency cycles. Architecture tests also enforce that controllers go through services for database work and JDBC stays in repositories.
 
 ## Uploads
 
@@ -59,7 +68,7 @@ For deployment, set the database, frontend origin, SMTP host, port, credentials,
 
 ```sh
 mvn test
-SHELF_PILOT_HTTP_TEST=true SHELF_DB_URL=jdbc:postgresql://localhost:5432/shelf_test mvn test
+SHELF_PILOT_HTTP_TEST=true SHELF_DB_URL=jdbc:postgresql://127.0.0.1:15432/shelf_test mvn test
 ```
 
 The HTTP tests require an existing disposable PostgreSQL database and populate it with test fixtures. They exercise the real HTTP API, session cookies, migrations, and publishing and campus gates. SMTP is mocked for the tests. Exercise upload and download with your R2 and ClamAV setup before opening the pilot. Digital checkout, refunds, and payouts are disabled until a provider is integrated.

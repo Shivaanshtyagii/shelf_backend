@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SHELF_GOOGLE_CLIENT_ID}
+            client-secret: ${SHELF_GOOGLE_CLIENT_SECRET}
+            redirect-uri: "${shelf.web-origin}/api/login/oauth2/code/google"
+            scope: openid,email,profile

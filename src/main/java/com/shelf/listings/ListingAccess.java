@@ -11,6 +11,4 @@ public interface ListingAccess {
     List<Listing> queue();
     Listing decide(UUID id, int revision, Listing.Status result);
     Listing takeDown(UUID id);
-    List<UUID> sellerQueue();
-    void decideSeller(UUID memberId, boolean approved);
 }
