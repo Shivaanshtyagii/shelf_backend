@@ -50,6 +50,20 @@ public class AccountRepository {
                 """).param("id", id).param("version", version).query(Member.class).optional();
     }
 
+    public Optional<Member> neonMember(String subject) {
+        return db.sql("select id, email, display_name, verified, role from accounts.member where neon_subject = :subject")
+                .param("subject", subject).query(Member.class).optional();
+    }
+
+    public void insertNeonMember(UUID id, String subject, String email, String name) {
+        db.sql("""
+                insert into accounts.member(id, neon_subject, email, display_name, verified)
+                values (:id, :subject, :email, :name, false)
+                on conflict do nothing
+                """).param("id", id).param("subject", subject).param("email", email).param("name", name)
+                .update();
+    }
+
     public void updateDisplayName(UUID member, String name) {
         db.sql("update accounts.member set display_name = :name where id = :id")
                 .param("name", name).param("id", member).update();

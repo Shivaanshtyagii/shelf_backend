@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: ${SHELF_DB_URL:jdbc:postgresql://127.0.0.1:15432/shelf}
-    username: ${SHELF_DB_USER:shelf}
-    password: ${SHELF_DB_PASSWORD:shelf}
+    url: ${SHELF_DB_URL}
+    username: ${SHELF_DB_USER}
+    password: ${SHELF_DB_PASSWORD}
   session:
     jdbc:
       initialize-schema: never
   mail:
     host: ${SHELF_SMTP_HOST:127.0.0.1}
-    port: ${SHELF_SMTP_PORT:1025}
+    port: ${SHELF_SMTP_PORT:587}
     username: ${SHELF_SMTP_USER:}
     password: ${SHELF_SMTP_PASSWORD:}
     properties:

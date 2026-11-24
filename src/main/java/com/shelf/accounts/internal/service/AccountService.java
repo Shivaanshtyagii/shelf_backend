@@ -56,7 +56,8 @@ public class AccountService implements Accounts {
     public Authentication login(String rawEmail, String password) {
         var entry = accounts.credentials(email(rawEmail));
         var hash = entry.map(AccountCredentials::passwordHash).orElse(dummyHash);
-        if (password.getBytes(StandardCharsets.UTF_8).length > 72 || !encoder.matches(password, hash) || entry.isEmpty()) {
+        if (password.getBytes(StandardCharsets.UTF_8).length > 72 || !encoder.matches(password, hash)
+                || entry.isEmpty() || entry.get().passwordHash() == null) {
             throw new ApiFault(HttpStatus.UNAUTHORIZED, "Email or password is incorrect.");
         }
         var credentials = entry.orElseThrow();
@@ -88,6 +89,8 @@ public class AccountService implements Accounts {
 
     @Override
     public Member current(Principal principal) {
+        if (principal instanceof Authentication authentication
+                && authentication.getPrincipal() instanceof Member member) return member;
         if (!(principal instanceof Authentication authentication)
                 || !(authentication.getPrincipal() instanceof SessionIdentity identity)) {
             throw new ApiFault(HttpStatus.UNAUTHORIZED, "Sign in to continue.");
@@ -113,13 +116,17 @@ public class AccountService implements Accounts {
     public Member updateProfile(Principal principal, String name) {
         var member = current(principal);
         accounts.updateDisplayName(member.id(), name.strip());
+        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Member) {
+            return new Member(member.id(), member.email(), name.strip(), member.verified(), member.role());
+        }
         return current(principal);
     }
 
     @Transactional
     public void requestChallenge(String rawEmail, ChallengePurpose purpose) {
         var email = email(rawEmail);
-        accounts.credentials(email).filter(entry -> purpose != ChallengePurpose.VERIFY || !entry.verified())
+        accounts.credentials(email).filter(entry -> entry.passwordHash() != null)
+                .filter(entry -> purpose != ChallengePurpose.VERIFY || !entry.verified())
                 .ifPresent(entry -> issueChallenge(entry.id(), email, purpose));
     }
 

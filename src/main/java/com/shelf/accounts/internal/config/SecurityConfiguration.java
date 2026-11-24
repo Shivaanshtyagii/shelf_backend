@@ -36,6 +36,7 @@ class SecurityConfiguration {
     }
 
     @Bean
+    @org.springframework.context.annotation.Profile("!neon")
     SecurityFilterChain filterChain(HttpSecurity http, HttpSessionSecurityContextRepository repository,
             org.springframework.beans.factory.ObjectProvider<GoogleLoginHandler> google) throws Exception {
         var handler = google.getIfAvailable();

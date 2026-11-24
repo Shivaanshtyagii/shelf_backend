@@ -1,0 +1,4 @@
+shelf:
+  neon:
+    base-url: ${NEON_AUTH_BASE_URL}
+    jwks: ${NEON_AUTH_JWKS_URL}
