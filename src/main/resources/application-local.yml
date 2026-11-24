@@ -1,0 +1,6 @@
+shelf:
+  secure-cookie: ${SHELF_AUTH_SECURE_COOKIE:${SHELF_SECURE_COOKIE:false}}
+logging:
+  level:
+    # Shows statement templates. Keep parameter binding at its default level.
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG

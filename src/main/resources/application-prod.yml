@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: ${SHELF_DB_POOL_MAX:10}
+      minimum-idle: ${SHELF_DB_POOL_MIN:0}
+      connection-timeout: 10000
+  web:
+    error:
+      include-exception: false
+      include-stacktrace: never
+      include-message: never
+      include-binding-errors: never
+shelf:
+  secure-cookie: true
+  web-origin: ${SHELF_WEB_ORIGIN}
+logging:
+  structured:
+    format:
+      console: ecs

@@ -1,4 +1,9 @@
 spring:
+  web:
+    error:
+      include-message: never
+      include-stacktrace: never
+      include-binding-errors: never
   datasource:
     url: ${SHELF_DB_URL}
     username: ${SHELF_DB_USER}
@@ -29,16 +34,16 @@ server:
       timeout: 8h
       cookie:
         http-only: true
-        secure: ${SHELF_SECURE_COOKIE:true}
+        secure: ${shelf.secure-cookie}
         same-site: lax
-  error:
-    include-message: never
 logging:
+  pattern:
+    level: "%5p [requestId=%X{requestId:-} userId=%X{userId:-}] %kvp"
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: WARN
     org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: WARN
 shelf:
-  secure-cookie: ${SHELF_SECURE_COOKIE:true}
+  secure-cookie: ${SHELF_AUTH_SECURE_COOKIE:${SHELF_SECURE_COOKIE:true}}
   web-origin: ${SHELF_WEB_ORIGIN:http://localhost:3000}
   mail-from: ${SHELF_MAIL_FROM:no-reply@shelf.local}
   assets:

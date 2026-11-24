@@ -1,4 +1,11 @@
+# Application queries use the pooled JDBC datasource from application.yml.
+# Schema migrations need a direct connection with a session-level lock.
+spring:
+  flyway:
+    url: ${SHELF_DB_DIRECT_URL:${SPRING_FLYWAY_URL}}
+    user: ${SHELF_DB_DIRECT_USER:${SPRING_FLYWAY_USER}}
+    password: ${SHELF_DB_DIRECT_PASSWORD:${SPRING_FLYWAY_PASSWORD}}
 shelf:
   neon:
-    base-url: ${NEON_AUTH_BASE_URL}
-    jwks: ${NEON_AUTH_JWKS_URL}
+    base-url: ${SHELF_AUTH_BASE_URL:${NEON_AUTH_BASE_URL}}
+    jwks: ${SHELF_AUTH_JWKS_URL:${NEON_AUTH_JWKS_URL}}

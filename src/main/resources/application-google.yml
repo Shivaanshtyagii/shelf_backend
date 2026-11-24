@@ -4,7 +4,7 @@ spring:
       client:
         registration:
           google:
-            client-id: ${SHELF_GOOGLE_CLIENT_ID}
-            client-secret: ${SHELF_GOOGLE_CLIENT_SECRET}
+            client-id: ${SHELF_AUTH_GOOGLE_CLIENT_ID:${SHELF_GOOGLE_CLIENT_ID}}
+            client-secret: ${SHELF_AUTH_GOOGLE_CLIENT_SECRET:${SHELF_GOOGLE_CLIENT_SECRET}}
             redirect-uri: "${shelf.web-origin}/api/login/oauth2/code/google"
             scope: openid,email,profile
